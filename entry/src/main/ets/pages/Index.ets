@@ -1,37 +1,74 @@
-import App from '@system.app'
+import router from '@ohos.router'
+
+class RouteInfo {
+  url: string
+  name: string
+
+  constructor(url: string, name: string) {
+    this.url = url
+    this.name = name
+  }
+}
+
 @Entry
 @Component
 struct Index {
-  @State message: string = 'Hello World'
-
-  @State count: number = 0
+  @State title: string = '页面列表'
+  routes: RouteInfo[] = [
+    new RouteInfo('pages/ImagePage', '图片案例'),
+    new RouteInfo('pages/PropPage', '任务统计案例'),
+    new RouteInfo('pages/ItemPage', '商品列表案例'),
+    new RouteInfo('pages/StatePage', 'State装饰器案例'),
+  ]
 
   build() {
-    Row() {
-      Column() {
-        Text(this.message)
-          .fontSize(50)
-          .fontWeight(FontWeight.Bold)
-          .onClick((e) => {
-            this.count++
-          })
+    Column() {
+      Text(this.title)
+        .fontSize(50)
+        .fontWeight(FontWeight.Bold)
+        .margin({ top: 20, bottom: 10 })
 
-        Text(this.count.toString())
-          .fontSize(50)
-          .fontWeight(FontWeight.Bold)
-          .fontColor("#36d")
-
-        // 网络图片
-        Image('https://images.pexels.com/photos/19119694/pexels-photo-19119694.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load')
-          .width(250)
-
-        // 本地文件
-        Image($r('app.media.app_icon'))
-          .width(250)
-          .interpolation(ImageInterpolation.High)
+      List({ space: 10 }) {
+        ForEach(this.routes, (item: RouteInfo, index: number) => {
+          ListItem() {
+            Row() {
+              Text((index + 1).toString() + '.')
+                .fontSize(20)
+                .fontColor(Color.White)
+              Text(item.name)
+                .fontSize(20)
+                .fontColor(Color.White)
+            }
+            .card()
+            .justifyContent(FlexAlign.SpaceBetween)
+            .onClick(() => {
+              router.pushUrl(
+                {
+                  url: item.url,
+                  params: { id: index + 1 }
+                },
+                router.RouterMode.Single,
+                err => {
+                  console.log(`路由失败,errCode: ${err.code} errMsg: ${err.message}`)
+                }
+              )
+            })
+          }
+        })
       }
       .width('100%')
+      .height('100%')
+      .layoutWeight(1) // 剩余的高度都给我
+      .alignListItem(ListItemAlign.Center)
     }
-    .height('100%')
+    .width('100%')
   }
+}
+
+@Styles function card() {
+  .width('95%')
+  .padding(20)
+  .backgroundColor('#38f')
+  .borderRadius(20)
+  .shadow({ radius: 6, color: '#1F000000', offsetX: 2, offsetY: 4 })
 }
